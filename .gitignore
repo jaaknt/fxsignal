@@ -2,6 +2,8 @@
 logs/
 data/
 output/
+testfx/
+scripts/
 
 # Standard python .gitignore stuff
 # Byte-compiled / optimized / DLL files

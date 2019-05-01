@@ -196,7 +196,7 @@ def parse_args():
     parser.add_argument("-s", "--strategy",
                         required=True,
                         choices=["buy", "sell"],
-                        help="buy - buy algorithm based on 8/21 EMA crossing + RSI, sell - sell algorithm based on 8/21 EMA crossing + RSI")
+                        help="buy - buy algorithm, sell - sell algorithm")
     parser.add_argument("-c", "--currency",
                         required=True,
                         choices=currency_list,

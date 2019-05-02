@@ -3,3 +3,5 @@ fxcm:
     log_file: fxcm.log
     access_token: <TOKEN>
     server: demo
+fleep:
+    token: <hook token>

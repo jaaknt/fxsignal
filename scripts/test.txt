@@ -1,0 +1,21 @@
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    handlers=[logging.FileHandler("./logs/fxsignal.log"), logging.StreamHandler()])
+from datetime import datetime
+import fxsignal
+import pandas as pd
+
+fxsignal.btester()
+config = {'access_token': 'da312911f73105f53c3fcd50f5798a2eb8487570', 'log_file': './logs/fxcm.log', 'log_level': 'warn', 'server': 'demo'}
+feed = fxsignal.FxcmFeed('EUR/USD', datetime(2019, 1, 1), datetime(2019, 5, 1), 'D1', config)
+data = pd.DataFrame()
+data = feed.get_feed()
+feed.save_csv(data)
+data = feed.read_csv()
+history = pd.DataFrame()
+history = feed.clean_data()
+print(data.head(5))
+history = feed.get_clean()
+
+btdata = fxsignal.FeedConverter.fxcm2bt(data)

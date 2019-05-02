@@ -32,7 +32,7 @@ class FxcmFeed(Feed):
         assert symbol in self.symbol_list, "Invalid symbol value: {}".format(symbol)
         assert period in fxcmpy.fxcmpy.PERIODS, "Invalid period value: {}".format(period)
         self.fxcm_config = fxcm_config
-        self.connection = self.get_connection()
+        self.connection = None
 
     def get_connection(self):
         """
@@ -52,6 +52,8 @@ class FxcmFeed(Feed):
 
     def get_feed(self):
         log.info("FXCM get_feed - symbol: {} period: {} start_date: {} end_date: {}".format(self.symbol, self.period, self.start_date, self.end_date))
+        if self.connection is None:
+            self.connection = self.get_connection()
         self.data = self.connection.get_candles(self.symbol, period=self.period, columns=['askopen', 'askclose', 'askhigh', 'asklow', 'tickqty'], start=self.start_date, end=self.end_date)
         #self.data['symbol'] = self.symbol
         #self.data['period'] = self.period
@@ -77,3 +79,9 @@ class FxcmFeed(Feed):
 
     def save_csv(self, data):
         data.to_csv(path_or_buf=self.get_csv_filename(), sep=';', index_label='id')
+
+    #def connect(self):
+    #    self.connection.connect()
+
+    def close(self):
+        self.connection.close()

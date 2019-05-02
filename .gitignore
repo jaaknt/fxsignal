@@ -3,7 +3,7 @@ logs/
 data/
 output/
 testfx/
-scripts/
+config.yaml
 
 # Standard python .gitignore stuff
 # Byte-compiled / optimized / DLL files

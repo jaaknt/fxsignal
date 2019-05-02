@@ -1,0 +1,5 @@
+fxcm:
+    log_level: warn
+    log_file: fxcm.log
+    access_token: <TOKEN>
+    server: demo

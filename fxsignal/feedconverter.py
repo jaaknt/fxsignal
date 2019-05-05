@@ -4,16 +4,16 @@ import backtrader as bt
 class FeedConverter(object):
 
    @staticmethod
-   def fxcm2bt(data):
+   def fxcm2bt(fxcm_data):
        return bt.feeds.PandasData(
-           dataname=data,
+           dataname=fxcm_data,
            # dtformat=('%Y-%m-%d '),
-           timeframe=bt.TimeFrame.Minutes,
-           datetime=1,
-           open=2,
-           close=3,
-           high=4,
-           low=5,
-           volume=6,
+           # timeframe=bt.TimeFrame.Minutes,
+           datetime=0,
+           open=1,
+           close=2,
+           high=3,
+           low=4,
+           volume=5,
            openinterest=-1
        )

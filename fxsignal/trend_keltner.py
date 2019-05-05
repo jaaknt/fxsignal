@@ -6,18 +6,18 @@ import logging
 
 log = logging.getLogger(__name__)
 
-currency_setup = {"EURUSD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
-                  "GBPUSD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
-                  "AUDUSD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
-                  "NZDUSD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
-                  "USDCHF": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.00},
-                  "USDCAD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.31}
+symbol_setup =   {"EUR/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
+                  "GBP/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
+                  "AUD/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
+                  "NZD/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
+                  "USD/CHF": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.00},
+                  "USD/CAD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.31}
                   }
 
 
 class BasicStrategy(bt.Strategy):
     params = dict(
-        currency='EURUSD',
+        symbol='EUR/USD',
         verbose=False,
         atr_period=14,
         stddev_period=20,
@@ -27,10 +27,10 @@ class BasicStrategy(bt.Strategy):
         macd_signal_period=9,
         macd_ema_period=8,
         squeeze_bb_multiplier=2.0,
-        squeeze_kc_multiplier=1.5,
-        stop1_atr_multiplier=1.2,
-        target1_atr_multiplier=1.6,
-        target2_atr_multiplier=0.3
+        squeeze_kc_multiplier=1.6,
+        stop1_atr_multiplier=1.0,
+        target1_atr_multiplier=1.2,
+        target2_atr_multiplier=0.4
     )
 
     (Start, Order1Added, Order1Completed, PreTarget2, Target2) = range(5)
@@ -64,7 +64,7 @@ class BasicStrategy(bt.Strategy):
         self.target1_price = None
         self.size = None
         self.max_loss = 2000.0  # 2000 USD = 2% from 100000
-        self.currency_params = currency_setup[self.p.currency]
+        self.symbol_params = symbol_setup[self.p.symbol]
 
     def notify_trade(self, trade):
         log.debug(
@@ -125,10 +125,11 @@ class BasicStrategy(bt.Strategy):
         pass
 
     def stop(self):
+        pass
         # if self.broker.getvalue() > 11000:
-        log.info('datetime: {} Ending Value {:.2f}'.format(
-            self.data.datetime.datetime(0),
-            self.broker.getvalue()))
+        #log.info('datetime: {} Ending Value {:.2f}'.format(
+        #    self.data.datetime.datetime(0),
+        #    self.broker.getvalue()))
 
     @staticmethod
     def get_parameter_list():
@@ -197,9 +198,9 @@ class BuyStrategy(BasicStrategy):
                     stop1_price = self.data.close - self.p.stop1_atr_multiplier * self.atr
                     self.target1_price = self.data.close + self.p.target1_atr_multiplier * self.atr
 
-                    loss_pips = round(self.p.stop1_atr_multiplier * self.atr, self.currency_params['pip_round']) / \
-                                self.currency_params['pip']
-                    self.size = max(round(self.max_loss / (loss_pips * self.currency_params['pip_value']), 0), 1) * 1000
+                    loss_pips = round(self.p.stop1_atr_multiplier * self.atr, self.symbol_params['pip_round']) / \
+                                self.symbol_params['pip']
+                    self.size = max(round(self.max_loss / (loss_pips * self.symbol_params['pip_value']), 0), 1) * 1000
                     log.debug('{} loss_pips: {:.0f} size: {:.0f} atr: {:.5f} multiplier: {:.2f}'.format(
                         self.data.datetime.datetime(0), loss_pips, self.size, self.atr[0], self.p.stop1_atr_multiplier))
 
@@ -218,7 +219,7 @@ class BuyStrategy(BasicStrategy):
                                                                      self.data.open[0]))
         elif self.stage == self.PreTarget2:
             self.stop_order = self.sell(exectype=bt.Order.Stop,
-                                        price=self.main_order_price + 10 * self.currency_params['pip'],
+                                        price=self.main_order_price + 10 * self.symbol_params['pip'],
                                         size=self.size / 2,
                                         transmit=True)
             self.limit_order = self.sell(exectype=bt.Order.Limit,
@@ -258,9 +259,9 @@ class SellStrategy(BasicStrategy):
                     stop1_price = self.data.close + self.p.stop1_atr_multiplier * self.atr
                     self.target1_price = self.data.close - self.p.target1_atr_multiplier * self.atr
 
-                    loss_pips = round(self.p.stop1_atr_multiplier * self.atr, self.currency_params['pip_round']) / \
-                                self.currency_params['pip']
-                    self.size = max(round(self.max_loss / (loss_pips * self.currency_params['pip_value']), 0), 1) * 1000
+                    loss_pips = round(self.p.stop1_atr_multiplier * self.atr, self.symbol_params['pip_round']) / \
+                                self.symbol_params['pip']
+                    self.size = max(round(self.max_loss / (loss_pips * self.symbol_params['pip_value']), 0), 1) * 1000
                     log.debug('{} loss_pips: {:.0f} size: {:.0f} atr: {:.5f} multiplier: {:.2f}'.format(
                         self.data.datetime.datetime(0), loss_pips, self.size, self.atr[0], self.p.stop1_atr_multiplier))
 
@@ -279,7 +280,7 @@ class SellStrategy(BasicStrategy):
                                                                      self.data.open[0]))
         elif self.stage == self.PreTarget2:
             self.stop_order = self.buy(exectype=bt.Order.Stop,
-                                       price=self.main_order_price - 10 * self.currency_params['pip'],
+                                       price=self.main_order_price - 10 * self.symbol_params['pip'],
                                        size=self.size / 2,
                                        transmit=True)
             self.limit_order = self.buy(exectype=bt.Order.Limit,

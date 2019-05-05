@@ -66,7 +66,7 @@ class FxcmFeed(Feed):
         self.data = pd.read_csv(self.get_csv_filename(), sep=';', index_col=0, parse_dates=[1])
         return self.data
 
-    def clean_data(self):
+    def clean(self):
         self.history = pd.DataFrame()
         self.history = self.history.append(self.data, ignore_index = True)
         self.history.drop(self.history[self.history.tickqty < 2000].index, inplace=True)

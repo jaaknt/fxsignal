@@ -63,7 +63,9 @@ class FxcmFeed(Feed):
         return self.data
 
     def read_csv(self):
-        self.data = pd.read_csv(self.get_csv_filename(), sep=';', index_col=0, parse_dates=[1])
+        df = pd.read_csv(self.get_csv_filename(), sep=';', index_col=0, parse_dates=[1])
+        mask = (df['date'] > self.start_date) & (df['date'] <= self.end_date)
+        self.data = df.loc[mask]
         return self.data
 
     def clean(self):

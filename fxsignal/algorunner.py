@@ -7,7 +7,7 @@ import backtrader as bt
 import pandas as pd
 
 # from cross_ema import BasicStrategy, BuyStrategy, SellStrategy
-from .trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
+from .algo.trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
 
 #currency_list = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCHF", "USDCAD"]
 # currency_list = ["EURUSD", "GBPUSD"]
@@ -15,9 +15,10 @@ from .trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
 
 
 class BaseRunner():
-    def __init__(self, feed, data, strategy, cash=10000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
+    def __init__(self, feed, data, algo, strategy, cash=10000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
         self.feed = feed
         self.data = data
+        self.algo = algo
         self.strategy = strategy
         self.output_dir = output_dir
         self.plot = plot
@@ -26,7 +27,16 @@ class BaseRunner():
         self.set_start_position(cash, leverage)
         self.cerebro.adddata(data)
         self.add_analyzer()
+        # self.import_algorithm(algo)
         # self.add_logging(args)
+
+    def import_algorithm(self, algo):
+        if algo == 'trend_keltner':
+            from .algo.trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
+        elif algo == 'trend_keltner2':
+            from .algo.trend_keltner2 import BasicStrategy, BuyStrategy, SellStrategy
+        else:
+            raise NotImplementedError
 
     def set_start_position(self, cash, leverage):
         self.cerebro.broker.setcash(cash)
@@ -43,8 +53,8 @@ class BaseRunner():
 
 
 class AlgoRunner(BaseRunner):
-    def __init__(self, feed, data, strategy, cash=100000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
-        super().__init__(feed, data, strategy, cash=cash, leverage=leverage, output_dir=output_dir, plot=plot, verbose=verbose)
+    def __init__(self, feed, data, algo, strategy, cash=100000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
+        super().__init__(feed, data, algo, strategy, cash=cash, leverage=leverage, output_dir=output_dir, plot=plot, verbose=verbose)
         self.add_analyzer()
 
     def statistics(self, strats):
@@ -77,8 +87,8 @@ class AlgoRunner(BaseRunner):
 
 
 class OptimizeRunner(BaseRunner):
-    def __init__(self, feed, data, strategy, cash=100000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
-        super().__init__(feed, data, strategy, cash=cash, leverage=leverage, output_dir=output_dir, plot=plot, verbose=verbose)
+    def __init__(self, feed, data, algo, strategy, cash=100000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
+        super().__init__(feed, data, algo, strategy, cash=cash, leverage=leverage, output_dir=output_dir, plot=plot, verbose=verbose)
 
     def statistics(self, strats):
         stat = []
@@ -116,15 +126,6 @@ class OptimizeRunner(BaseRunner):
         self.cerebro.optstrategy(
             SellStrategy if self.strategy == "sell" else BuyStrategy,
             **kwargs
-            # rsi_threshold=range(72, 70, -2) if self.args.strategy == "sell" else range(28, 30, 2),
-            # rsi_threshold=range(70, 62, -2) if self.args.strategy == "sell" else range(30, 38, 2),
-            # stage1_profit_target=[0.01200, 0.01300],
-            # stage1_profit_target=[0.0080, 0.0090, 0.0100, 0.01100, 0.01200, 0.01300, 0.01400, 0.01500, 0.01600],
-            # stage1_profit_target=[0.0080, 0.0100, 0.01200, 0.01400, 0.01600],
-            # stage1_loss_limit=[0.01400, 0.01600],  # , 0.01800, 0.0200, 0.0220]
-            # stage1_loss_limit=[0.01200, 0.01400],
-            # stage1_loss_limit=[0.01200, 0.01400, 0.01600, 0.01800, 0.0200, 0.0220],
-            # verbose=[self.args.verbose]
         )
         self.strats = self.cerebro.run(stdstats=False)
         self.statistics(self.strats)

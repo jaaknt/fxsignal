@@ -7,7 +7,8 @@ import backtrader as bt
 import pandas as pd
 
 # from cross_ema import BasicStrategy, BuyStrategy, SellStrategy
-from .algo.trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
+# from .algo.trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
+from .algo import import_algo_class, import_algo_module
 
 #currency_list = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCHF", "USDCAD"]
 # currency_list = ["EURUSD", "GBPUSD"]
@@ -27,16 +28,12 @@ class BaseRunner():
         self.set_start_position(cash, leverage)
         self.cerebro.adddata(data)
         self.add_analyzer()
+        # self.module = import_algo_module(algo)
+        self.StrategyClass = import_algo_class(algo, strategy)
+        # logging.info("module: {}".format(self.module.__name__))
+        logging.info("class: {}.{}".format(self.StrategyClass.__module__, self.StrategyClass.__name__))
         # self.import_algorithm(algo)
         # self.add_logging(args)
-
-    def import_algorithm(self, algo):
-        if algo == 'trend_keltner':
-            from .algo.trend_keltner import BasicStrategy, BuyStrategy, SellStrategy
-        elif algo == 'trend_keltner2':
-            from .algo.trend_keltner2 import BasicStrategy, BuyStrategy, SellStrategy
-        else:
-            raise NotImplementedError
 
     def set_start_position(self, cash, leverage):
         self.cerebro.broker.setcash(cash)
@@ -76,7 +73,7 @@ class AlgoRunner(BaseRunner):
 
     def run(self):
         self.cerebro.addstrategy(
-            SellStrategy if self.strategy == "sell" else BuyStrategy,
+            self.StrategyClass,
             symbol=self.feed.symbol,
             verbose=self.verbose)
         self.cerebro.addwriter(bt.WriterFile, csv=True, out=('{}results.csv'.format(self.output_dir)))
@@ -100,9 +97,9 @@ class OptimizeRunner(BaseRunner):
                 logging.info('Warning: No trades in period {} {} {}',
                     format(self.strategy, self.feed.symbol, params))
             else:
-                row = (self.strategy, self.feed.symbol, BasicStrategy.get_parameter_values(params, 0),
-                       BasicStrategy.get_parameter_values(params, 1), BasicStrategy.get_parameter_values(params, 2),
-                       BasicStrategy.get_parameter_values(params, 3), BasicStrategy.get_parameter_values(params, 4),
+                row = (self.strategy, self.feed.symbol, self.StrategyClass.get_parameter_values(params, 0),
+                       self.StrategyClass.get_parameter_values(params, 1), self.StrategyClass.get_parameter_values(params, 2),
+                       self.StrategyClass.get_parameter_values(params, 3), self.StrategyClass.get_parameter_values(params, 4),
                        analyzer.total.closed, round(analyzer.pnl.net.total, 2),
                        analyzer.won.total, round(analyzer.won.pnl.total, 2), round(analyzer.won.pnl.max, 2),
                        round(analyzer.won.pnl.average, 2),
@@ -111,20 +108,20 @@ class OptimizeRunner(BaseRunner):
                 stat.append(row)
 
         df = pd.DataFrame(stat,
-                          columns=['strategy', 'symbol',BasicStrategy.get_parameter_keys(params, 0), BasicStrategy.get_parameter_keys(params, 1),
-                                   BasicStrategy.get_parameter_keys(params, 2), BasicStrategy.get_parameter_keys(params, 3), BasicStrategy.get_parameter_keys(params, 4),
+                          columns=['strategy', 'symbol',self.StrategyClass.get_parameter_keys(params, 0), self.StrategyClass.get_parameter_keys(params, 1),
+                                   self.StrategyClass.get_parameter_keys(params, 2), self.StrategyClass.get_parameter_keys(params, 3), self.StrategyClass.get_parameter_keys(params, 4),
                                    'total_closed', 'net_total',
                                    'won_total', 'won_net', 'won_max', 'won_avg',
                                    'lost_total', 'lost_net', 'lost_max', 'lost_avg'])
-        df.to_csv('{}{}_{}{}.csv'.format(self.output_dir, BasicStrategy.get_algorithm_name(), self.strategy, self.feed.symbol.replace('/','')), sep=';')
+        df.to_csv('{}{}_{}{}.csv'.format(self.output_dir, self.StrategyClass.get_algorithm_name(), self.strategy, self.feed.symbol.replace('/','')), sep=';')
         logging.info(df.sort_values(['net_total'], ascending=False).head(5)[
-                         ['strategy', 'symbol', BasicStrategy.get_parameter_keys(params, 0), BasicStrategy.get_parameter_keys(params, 1), BasicStrategy.get_parameter_keys(params, 2),
-                          BasicStrategy.get_parameter_keys(params, 3), BasicStrategy.get_parameter_keys(params, 4), 'total_closed', 'net_total']])
+                         ['strategy', 'symbol', self.StrategyClass.get_parameter_keys(params, 0), self.StrategyClass.get_parameter_keys(params, 1), self.StrategyClass.get_parameter_keys(params, 2),
+                          self.StrategyClass.get_parameter_keys(params, 3), self.StrategyClass.get_parameter_keys(params, 4), 'total_closed', 'net_total']])
 
     def run(self):
-        kwargs = BuyStrategy.get_parameter_list()
+        kwargs = self.StrategyClass.get_parameter_list()
         self.cerebro.optstrategy(
-            SellStrategy if self.strategy == "sell" else BuyStrategy,
+            self.StrategyClass,
             **kwargs
         )
         self.strats = self.cerebro.run(stdstats=False)

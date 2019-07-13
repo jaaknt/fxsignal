@@ -8,6 +8,14 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     handlers=[logging.FileHandler("./logs/algo.log"), logging.StreamHandler()])
 
+def simplebuy2(config):
+    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed.read_csv()
+    data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
+    runner = fxsignal.AlgoRunner(feed, data, 'trend_hma','buy')
+    runner.run()
+    logging.info("simplebuy symbol: {} {}".format(feed.symbol, runner.feed.symbol))
+
 def simplebuy(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
@@ -42,10 +50,11 @@ def optimizesell(config):
 def run():
     with open('./scripts/config.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-    simplebuy(config)
-    simplesell(config)
-    optimizebuy(config)
-    optimizesell(config)
+    simplebuy2(config)
+#    simplebuy(config)
+#    simplesell(config)
+#    optimizebuy(config)
+#    optimizesell(config)
 
 if __name__ == '__main__':
     run()

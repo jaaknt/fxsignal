@@ -9,3 +9,9 @@ This framework can be used also to
 - backtest and evaluate different strategies
 
 There is also implemented [algorithms description](./algorithm.md).
+
+## Development
+Local build
+> python setup.py install
+Testing
+> python scripts/algo.py

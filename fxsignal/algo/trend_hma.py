@@ -266,8 +266,8 @@ class SellStrategy(BasicStrategy):
                     self.target1_price = self.data.close - self.p.target1_atr_multiplier * self.atr
 
                     self.size = self.symbol_parameter.get_size(self.p.stop1_atr_multiplier * self.atr)
-                    log.debug('{} loss_pips: {:.0f} size: {:.0f} atr: {:.5f} multiplier: {:.2f}'.format(
-                        self.data.datetime.datetime(0), loss_pips, self.size, self.atr[0], self.p.stop1_atr_multiplier))
+                    log.debug('{} size: {:.0f} atr: {:.5f} multiplier: {:.2f}'.format(
+                        self.data.datetime.datetime(0), self.size, self.atr[0], self.p.stop1_atr_multiplier))
 
                     self.main_order = self.sell(exectype=bt.Order.Market, price=None, size=self.size, transmit=True)
                     self.stop_order = self.buy(exectype=bt.Order.Stop,

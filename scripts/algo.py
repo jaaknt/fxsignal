@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     handlers=[logging.FileHandler("./logs/algo.log"), logging.StreamHandler()])
 
-def simplebuy2(config):
+def simplebuy_hma(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
@@ -16,7 +16,7 @@ def simplebuy2(config):
     runner.run()
     logging.info("simplebuy symbol: {} {}".format(feed.symbol, runner.feed.symbol))
 
-def simplebuy(config):
+def simplebuy_keltner(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
@@ -24,37 +24,44 @@ def simplebuy(config):
     runner.run()
     logging.info("simplebuy symbol: {} {}".format(feed.symbol, runner.feed.symbol))
 
-def simplesell(config):
+def simplebuy_keltner2(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
-    runner = fxsignal.AlgoRunner(feed, data, 'trend_keltner2','sell')
+    runner = fxsignal.AlgoRunner(feed, data, 'trend_keltner2','buy')
     runner.run()
 
-def optimizebuy(config):
+def optimizesell_hma(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
-    runner = fxsignal.OptimizeRunner(feed, data, 'trend_keltner','buy')
+    runner = fxsignal.OptimizeRunner(feed, data, 'trend_hma','sell')
     runner.run()
 
-def optimizesell(config):
+def optimizesell_keltner(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
     runner = fxsignal.OptimizeRunner(feed, data, 'trend_keltner', 'sell')
     runner.run()
 
+def optimizesell_keltner2(config):
+    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed.read_csv()
+    data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
+    runner = fxsignal.OptimizeRunner(feed, data, 'trend_keltner2', 'sell')
+    runner.run()
 
 
 def run():
     with open('./scripts/config.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-    simplebuy2(config)
-#    simplebuy(config)
-#    simplesell(config)
-#    optimizebuy(config)
-#    optimizesell(config)
+    simplebuy_hma(config)
+    simplebuy_keltner(config)
+    simplebuy_keltner2(config)
+    optimizesell_hma(config)
+    optimizesell_keltner(config)
+    optimizesell_keltner2(config)
 
 if __name__ == '__main__':
     run()

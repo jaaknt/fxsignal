@@ -32,7 +32,9 @@ class BasicStrategy(BaseStrategy):
     )
 
     def __init__(self):
-        super().__init__()
+        super().__init__(verbose=self.p.verbose)
+        if self.p.verbose:
+            log.setLevel(logging.DEBUG)
         self.hlc3 = (self.data.high + self.data.low + self.data.close)/3
         self.baseline = btind.WMA(self.hlc3, period = self.p.wma_period)
         self.exit = btind.HMA(self.hlc3, period = self.p.hma_period)
@@ -60,10 +62,10 @@ class BasicStrategy(BaseStrategy):
 
     @staticmethod
     def get_parameter_list():
-        return {"macd_ema_period": [12, 13],
-                "stop1_atr_multiplier": [0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5],
-                "target1_atr_multiplier": [1.2, 1.3, 1.4, 1.5, 1.6],
-                "target2_atr_multiplier": [0.2, 0.4, 0.6, 0.8, 1.0],
+        return {"macd_ema_period": [10,12, 14],
+                "stop1_atr_multiplier": [0.9, 1.1, 1.3, 1.5],
+                "target1_atr_multiplier": [1.0, 1.2,  1.4, 1.6],
+                "target2_atr_multiplier": [0.2, 0.6, 1.0],
                 "squeeze_kc_multiplier": [1.5, 1.6, 1.7]
                 }
 

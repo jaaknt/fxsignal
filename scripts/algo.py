@@ -72,14 +72,14 @@ def optimizesell_keltner2(config):
 def run():
     with open('./scripts/config.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-    simplebuy_hma(config)
+#    simplebuy_hma(config)
     simplesell_hma(config)
-    simplebuy_keltner(config)
-    simplebuy_keltner2(config)
-    optimizebuy_hma(config)
-    optimizesell_hma(config)
-    optimizesell_keltner(config)
-    optimizesell_keltner2(config)
+#    simplebuy_keltner(config)
+#    simplebuy_keltner2(config)
+#    optimizebuy_hma(config)
+#    optimizesell_hma(config)
+#    optimizesell_keltner(config)
+#    optimizesell_keltner2(config)
 
 if __name__ == '__main__':
     run()

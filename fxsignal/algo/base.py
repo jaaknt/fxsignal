@@ -10,8 +10,10 @@ class BaseStrategy(bt.Strategy):
 
     (Start, Order1Added, Order1Completed, PreTarget2, Target2, ExitOrderAdded) = range(6)
 
-    def __init__(self):
+    def __init__(self, verbose=False):
         super().__init__()
+        if verbose:
+            log.setLevel(logging.DEBUG)
 
     def notify_trade(self, trade):
         log.debug(
@@ -28,16 +30,20 @@ class BaseStrategy(bt.Strategy):
         # print (self.data[0])
 
     def notify_order(self, order):
+        if order.price is not None and order.price != 0.0:
+            price = order.price
+        elif order.executed.price is not None and order.executed.price != 0.0:
+            price = order.executed.price
+        else:
+            price = self.data.open[0]
+
         log.debug(
             '{} | Order ref: {} | Type {} | Status {} | Price {:.5f}'.format(self.data.datetime.datetime(0), order.ref,
-                                                                             order.ordtypename(),
-                                                                             order.getstatusname(),
-                                                                             0.0 if order.price is None else order.price))
+                                                                             order.ordtypename(), order.getstatusname(), price))
         if order.status == order.Margin:
             log.info('{} | MARGIN CALL Order ref: {} | Type {} | Status {} | Price {:.5f}'.format(
                 self.data.datetime.datetime(0), order.ref, order.ordtypename(),
-                order.getstatusname(),
-                0.0 if order.price is None else order.price))
+                order.getstatusname(), price))
 
         old_stage = self.stage
         if order.status == order.Completed:
@@ -65,7 +71,7 @@ class BaseStrategy(bt.Strategy):
                         self.data.datetime.datetime(0), order.ref,
                         old_stage,
                         self.stage,
-                        order.executed.price,
+                        price,
                         order.executed.size))
 
             log.debug(
@@ -73,7 +79,7 @@ class BaseStrategy(bt.Strategy):
                     self.data.datetime.datetime(0), order.ref,
                     old_stage,
                     self.stage,
-                    order.executed.price,
+                    price,
                     order.executed.size))
             # order.executed.value
 

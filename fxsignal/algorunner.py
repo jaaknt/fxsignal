@@ -94,8 +94,7 @@ class OptimizeRunner(BaseRunner):
             analyzer = strats[i][0].analyzers.tradeanalyzer.get_analysis()
             # logging.info('Type: {}'.format(dict(params)))
             if (analyzer.total.total == 0) or (analyzer.total.total == 1 and analyzer.total.open == 1):
-                logging.info('Warning: No trades in period {} {} {}',
-                    format(self.strategy, self.feed.symbol, params))
+                logging.info('Warning: No trades in period {} {}'.format(self.strategy, self.feed.symbol))
             else:
                 row = (self.strategy, self.feed.symbol, self.StrategyClass.get_parameter_values(params, 0),
                        self.StrategyClass.get_parameter_values(params, 1), self.StrategyClass.get_parameter_values(params, 2),

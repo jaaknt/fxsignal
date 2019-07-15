@@ -166,8 +166,8 @@ class BaseStrategy(bt.Strategy):
             self.exit_order = self.sell(exectype=bt.Order.Market, price=None, size=self.size if self.stage == self.Order1Completed else self.size / 2, transmit=True)
             self.stage = self.ExitOrderAdded
         else:
-            log.debug('{} | next | Old stage {} | New stage {}'.format(self.data.datetime.datetime(0), old_stage, self.stage))
-            pass
+            if old_stage != self.stage:
+                log.debug('{} | next | Old stage {} | New stage {}'.format(self.data.datetime.datetime(0), old_stage, self.stage))
 
 
     def next_sell_v1(self):

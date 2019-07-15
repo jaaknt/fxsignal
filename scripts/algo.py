@@ -55,14 +55,21 @@ def optimizesell_hma(config):
     runner.run()
 
 def optimizesell_keltner(config):
-    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
     runner = fxsignal.OptimizeRunner(feed, data, 'trend_keltner', 'sell')
     runner.run()
 
+def optimizebuy_keltner2(config):
+    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed.read_csv()
+    data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
+    runner = fxsignal.OptimizeRunner(feed, data, 'trend_keltner2', 'sell')
+    runner.run()
+
 def optimizesell_keltner2(config):
-    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed = fxsignal.FxcmFeed('EUR/USD', datetime(2015, 10, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
     runner = fxsignal.OptimizeRunner(feed, data, 'trend_keltner2', 'sell')
@@ -73,12 +80,13 @@ def run():
     with open('./scripts/config.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 #    simplebuy_hma(config)
-    simplesell_hma(config)
+#    simplesell_hma(config)
 #    simplebuy_keltner(config)
 #    simplebuy_keltner2(config)
-#    optimizebuy_hma(config)
-#    optimizesell_hma(config)
+    optimizebuy_hma(config)
+    optimizesell_hma(config)
 #    optimizesell_keltner(config)
+#    optimizebuy_keltner2(config)
 #    optimizesell_keltner2(config)
 
 if __name__ == '__main__':

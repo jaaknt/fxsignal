@@ -11,7 +11,8 @@ symbol_setup =   {"EUR/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
                   "AUD/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
                   "NZD/USD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1},
                   "USD/CHF": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.00},
-                  "USD/CAD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.31}
+                  "USD/CAD": {"pip": 0.0001, "pip_round": 4, "pip_value": 0.1 / 1.31},
+                  "USD/JPY": {"pip": 0.01,   "pip_round": 2, "pip_value": 10.0 / 110.0}
                   }
 
 

@@ -25,7 +25,7 @@ class FxcmFeed(Feed):
     # period_list = ['m1', 'm5', 'm15', 'm30', 'H1', 'H2', 'H3', 'H4', 'H6', 'H8', 'D1', 'W1', 'M1']
     symbol_list = ['EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD', 'USD/CAD', 'USD/CHF', 'GBP/AUD', 'EUR/JPY', 'EUR/CHF',
                    'AUD/CAD', 'AUD/JPY', 'GBP/NZD', 'GBP/JPY', 'GBP/CHF', 'EUR/NZD', 'AUD/NZD', 'CAD/CHF', 'CAD/JPY',
-                   'GBP/CHF', 'NZD/CHF']
+                   'GBP/CHF', 'NZD/CHF', 'USD/JPY']
 
     def __init__(self, symbol, start_date, end_date, period, fxcm_config):
         super().__init__(symbol, start_date, end_date, period)

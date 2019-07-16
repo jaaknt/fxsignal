@@ -9,9 +9,15 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     handlers=[logging.FileHandler("./logs/collect.log"), logging.StreamHandler()])
 
-symbol_list = ['EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD', 'USD/CAD', 'USD/CHF', 'GBP/AUD', 'EUR/JPY', 'EUR/CHF',
-               'AUD/CAD', 'AUD/JPY', 'GBP/NZD', 'GBP/JPY', 'GBP/CHF', 'EUR/NZD', 'AUD/NZD', 'CAD/CHF', 'CAD/JPY',
-               'GBP/CHF', 'NZD/CHF', 'USD/JPY']
+#symbol_list = ['EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD', 'USD/CAD', 'USD/CHF', 'GBP/AUD', 'EUR/JPY', 'EUR/CHF',
+#               'AUD/CAD', 'AUD/JPY', 'GBP/NZD', 'GBP/JPY', 'GBP/CHF', 'EUR/NZD', 'AUD/NZD', 'CAD/CHF', 'CAD/JPY',
+#               'GBP/CHF', 'NZD/CHF', 'USD/JPY']
+
+# 'AUD/CHF','CHF/JPY','EUR/AUD','EUR/CAD','EUR/GBP','GBP/CAD','NZD/JPY',
+symbol_list = ['AUD/CAD','AUD/JPY','AUD/NZD','AUD/USD','CAD/CHF',
+               'CAD/JPY','EUR/CHF','EUR/JPY','EUR/NZD','EUR/USD',
+               'GBP/AUD','GBP/CHF','GBP/JPY','GBP/NZD','GBP/USD',
+               'NZD/CHF','NZD/USD','USD/CAD','USD/CHF','USD/JPY']
 
 def collect(config):
     start_date = datetime(2010, 1, 1)

@@ -14,12 +14,11 @@ class BasicStrategy(BaseStrategy):
     params = dict(
         symbol='EUR/USD',
         verbose=False,
-        decision_analyzer=True,
         max_loss_percent = 0.02, # max risk percent from protfolio value per trade
-        wma_period=22,
+        wma_period=20,
         hma_period=17,
         atr_period=14,
-        stddev_period=20,
+        stddev_period=13,
         squeeze_period=20,
         macd_fast_period=12,
         macd_slow_period=26,
@@ -27,9 +26,10 @@ class BasicStrategy(BaseStrategy):
         macd_ema_period=13,
         squeeze_bb_multiplier=2.0,
         squeeze_kc_multiplier=1.5,
-        stop1_atr_multiplier=1.5,
+        stop1_atr_multiplier=1.0,
         target1_atr_multiplier=1.0,
-        target2_atr_multiplier=2.0
+        target2_atr_multiplier=1.0,
+        stddev_threshold = 0.005
     )
 
     def __init__(self):
@@ -63,40 +63,41 @@ class BasicStrategy(BaseStrategy):
 
     @staticmethod
     def get_parameter_list():
-        return {"wma_period": [17, 19, 21, 23],
-                "stop1_atr_multiplier": [0.8, 1.0, 1.2, 1.5],
-                "target1_atr_multiplier": [1.0, 1.2, 1.4],
-                "target2_atr_multiplier": [0.2, 0.6, 1.0],
-                "squeeze_kc_multiplier": [1.5]
+        return {"stddev_threshold": [0.005],
+                "stop1_atr_multiplier": [1.0],
+                "target1_atr_multiplier": [1.0],
+                #"target2_atr_multiplier": [1.0],
+                "stddev_period": [13],
+                "squeeze_period": [22]
                 }
 
     @staticmethod
     def get_parameter_values(params, i):
         if i == 0:
-            return params.wma_period
+            return params.stddev_threshold
         elif i == 1:
             return params.stop1_atr_multiplier
         elif i == 2:
             return params.target1_atr_multiplier
         elif i == 3:
-            return params.target2_atr_multiplier
+            return params.stddev_period
         elif i == 4:
-            return params.squeeze_kc_multiplier
+            return params.squeeze_period
         else:
             return ''
 
     @staticmethod
     def get_parameter_keys(params, i):
         if i == 0:
-            return 'wma_period'
+            return 'stddev_threshold'
         elif i == 1:
             return 'stop1_atr_multiplier'
         elif i == 2:
             return 'target1_atr_multiplier'
         elif i == 3:
-            return 'target2_atr_multiplier'
+            return 'stddev_period'
         elif i == 4:
-            return 'squeeze_kc_multiplier'
+            return 'squeeze_period'
         else:
             return ''
 
@@ -106,30 +107,32 @@ class BasicStrategy(BaseStrategy):
 
     def buy_signal(self):
         if self.data.close[0] > self.baseline[0]: #and self.baseline[0] > self.baseline[-1]:
+            if self.stddev[0] > self.p.stddev_threshold:
             #if self.stddev[0] * self.p.squeeze_bb_multiplier > self.atr[0] * self.p.squeeze_kc_multiplier:
-            if (self.macd_ema[0] > self.macd_ema[-1] and self.macd.histo[0] > self.macd.histo[-1]) and (self.squeeze[0] > self.squeeze[-1]):
-                return True
+                if (self.macd_ema[0] > self.macd_ema[-1] and self.macd.histo[0] > self.macd.histo[-1]) and (self.squeeze[0] > self.squeeze[-1]):
+                    return True
         return False
 
     def sell_signal(self):
         if self.data.close[0] < self.baseline[0]: # and self.baseline[0] < self.baseline[-1]:
+            if self.stddev[0] > self.p.stddev_threshold:
             #if self.stddev * self.p.squeeze_bb_multiplier > self.atr * self.p.squeeze_kc_multiplier:
-            if (self.macd_ema[0] < self.macd_ema[-1] and self.macd.histo[0] < self.macd.histo[-1]) and (self.squeeze[0] < self.squeeze[-1]):
-                return True
+                if (self.macd_ema[0] < self.macd_ema[-1] and self.macd.histo[0] < self.macd.histo[-1]) and (self.squeeze[0] < self.squeeze[-1]):
+                    return True
         return False
 
     def exit_buy_signal(self):
-        return False
-#        if self.stage == self.Order1Completed:
-#            return self.data.high < self.exit or self.data.close < self.baseline
+#        return False
+        if self.stage == self.Order1Completed:
+            return self.data.high < self.exit or self.data.close < self.baseline
         if self.stage == self.Target2:
             return self.data.high[0] < self.exit[0] or self.data.close[0] < self.baseline[0]
         return False
 
     def exit_sell_signal(self):
-        return False
-#        if self.stage == self.Order1Completed:
-#            return self.data.low > self.exit or self.data.close > self.baseline
+#        return False
+        if self.stage == self.Order1Completed:
+            return self.data.low > self.exit or self.data.close > self.baseline
         if self.stage == self.Target2:
             return self.data.low[0] > self.exit[0] or self.data.close[0] > self.baseline[0]
         return False

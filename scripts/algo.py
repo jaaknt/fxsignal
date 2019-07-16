@@ -12,7 +12,7 @@ def simplebuy_hma(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 4, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
-    runner = fxsignal.AlgoRunner(feed, data, 'trend_hma','buy')
+    runner = fxsignal.AlgoRunner(feed, data, 'trend_hma','buy', plot=True, verbose=False)
     runner.run()
     logging.info("simplebuy symbol: {} {}".format(feed.symbol, runner.feed.symbol))
 
@@ -20,7 +20,7 @@ def simplesell_hma(config):
     feed = fxsignal.FxcmFeed('EUR/USD', datetime(2018, 4, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
-    runner = fxsignal.AlgoRunner(feed, data, 'trend_hma','sell', plot=False, verbose=True)
+    runner = fxsignal.AlgoRunner(feed, data, 'trend_hma','sell', plot=True, verbose=True)
     runner.run()
     logging.info("simplebuy symbol: {} {}".format(feed.symbol, runner.feed.symbol))
 
@@ -79,12 +79,12 @@ def optimizesell_keltner2(config):
 def run():
     with open('./scripts/config.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-#    simplebuy_hma(config)
-#    simplesell_hma(config)
+    simplebuy_hma(config)
+    simplesell_hma(config)
 #    simplebuy_keltner(config)
 #    simplebuy_keltner2(config)
-    optimizebuy_hma(config)
-    optimizesell_hma(config)
+#    optimizebuy_hma(config)
+#    optimizesell_hma(config)
 #    optimizesell_keltner(config)
 #    optimizebuy_keltner2(config)
 #    optimizesell_keltner2(config)

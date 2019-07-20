@@ -14,6 +14,7 @@ from .algo import import_algo_class, import_algo_module
 # currency_list = ["EURUSD", "GBPUSD"]
 #output_dir = './output/'
 
+log = logging.getLogger(__name__)
 
 class BaseRunner():
     def __init__(self, feed, data, algo, strategy, cash=10000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
@@ -30,10 +31,10 @@ class BaseRunner():
         self.add_analyzer()
         # self.module = import_algo_module(algo)
         self.StrategyClass = import_algo_class(algo, strategy)
-        # logging.info("module: {}".format(self.module.__name__))
-        logging.info("class: {}.{}".format(self.StrategyClass.__module__, self.StrategyClass.__name__))
+        # log.info("module: {}".format(self.module.__name__))
+        log.info("class: {}.{}".format(self.StrategyClass.__module__, self.StrategyClass.__name__))
         # self.import_algorithm(algo)
-        # self.add_logging(args)
+        # self.add_log(args)
 
     def set_start_position(self, cash, leverage):
         self.cerebro.broker.setcash(cash)
@@ -41,6 +42,10 @@ class BaseRunner():
 
     def add_analyzer(self, analyzer=bt.analyzers.TradeAnalyzer):
         self.cerebro.addanalyzer(analyzer)
+
+    def get_strategy_class_name(self):
+        words = self.StrategyClass.__module__.split('.')
+        return words[2]
 
     def run(self):
         raise NotImplementedError
@@ -58,18 +63,18 @@ class AlgoRunner(BaseRunner):
         analyzer = strats[0].analyzers.tradeanalyzer.get_analysis()
         # logging.info(analyzer)
         if (analyzer.total.total == 0) or (analyzer.total.total == 1 and analyzer.total.open == 1):
-            logging.info('Warning: No trades in period')
+            log.info('Warning: No trades in period')
         else:
-            logging.info(
+            log.info(
                 'Won trades (count/total/max/average)  {:3d} |  {:.2f} |  {:.2f} |  {:.2f}'.format(
                     analyzer.won.total, analyzer.won.pnl.total, analyzer.won.pnl.max, analyzer.won.pnl.average))
-            logging.info(
+            log.info(
                 'Lost trades (count/total/max/average) {:3d} | {:.2f} | {:.2f} | {:.2f}'.format(
                     analyzer.lost.total, analyzer.lost.pnl.total, analyzer.lost.pnl.max, analyzer.lost.pnl.average))
-            logging.info(
+            log.info(
                 'Total trades / net                    {:3d} |  {:.2f}'.format(
                     analyzer.total.closed, analyzer.pnl.net.total))
-            logging.info('Final Portfolio Value: {:.2f}'.format(self.cerebro.broker.getvalue()))
+            log.info('Final Portfolio Value: {:.2f}'.format(self.cerebro.broker.getvalue()))
 
     def run(self):
         self.cerebro.addstrategy(
@@ -92,13 +97,14 @@ class OptimizeRunner(BaseRunner):
         for i in range(0, len(strats)):
             params = strats[i][0].params
             analyzer = strats[i][0].analyzers.tradeanalyzer.get_analysis()
-            # logging.info('Type: {}'.format(dict(params)))
+            # log.info('Type: {}'.format(dict(params)))
             if (analyzer.total.total == 0) or (analyzer.total.total == 1 and analyzer.total.open == 1):
-                logging.info('Warning: No trades in period {} {}'.format(self.strategy, self.feed.symbol))
+                log.info('Warning: No trades in period {} {}'.format(self.strategy, self.feed.symbol))
             else:
                 row = (self.strategy, self.feed.symbol, self.StrategyClass.get_parameter_values(params, 0),
                        self.StrategyClass.get_parameter_values(params, 1), self.StrategyClass.get_parameter_values(params, 2),
                        self.StrategyClass.get_parameter_values(params, 3), self.StrategyClass.get_parameter_values(params, 4),
+                       self.StrategyClass.get_parameter_values(params, 5), self.StrategyClass.get_parameter_values(params, 6),
                        analyzer.total.closed, round(analyzer.pnl.net.total, 2),
                        analyzer.won.total, round(analyzer.won.pnl.total, 2), round(analyzer.won.pnl.max, 2),
                        round(analyzer.won.pnl.average, 2),
@@ -109,13 +115,15 @@ class OptimizeRunner(BaseRunner):
         df = pd.DataFrame(stat,
                           columns=['strategy', 'symbol',self.StrategyClass.get_parameter_keys(params, 0), self.StrategyClass.get_parameter_keys(params, 1),
                                    self.StrategyClass.get_parameter_keys(params, 2), self.StrategyClass.get_parameter_keys(params, 3), self.StrategyClass.get_parameter_keys(params, 4),
+                                   self.StrategyClass.get_parameter_keys(params, 5), self.StrategyClass.get_parameter_keys(params, 6),
                                    'total_closed', 'net_total',
                                    'won_total', 'won_net', 'won_max', 'won_avg',
                                    'lost_total', 'lost_net', 'lost_max', 'lost_avg'])
-        df.to_csv('{}{}_{}{}.csv'.format(self.output_dir, self.StrategyClass.get_algorithm_name(), self.strategy, self.feed.symbol.replace('/','')), sep=';')
-        logging.info(df.sort_values(['net_total'], ascending=False).head(5)[
+        df.to_csv('{}{}_{}{}.csv'.format(self.output_dir, self.get_strategy_class_name(), self.strategy, self.feed.symbol.replace('/','')), sep=';')
+        log.info(df.sort_values(['net_total'], ascending=False).head(5)[
                          ['strategy', 'symbol', self.StrategyClass.get_parameter_keys(params, 0), self.StrategyClass.get_parameter_keys(params, 1), self.StrategyClass.get_parameter_keys(params, 2),
-                          self.StrategyClass.get_parameter_keys(params, 3), self.StrategyClass.get_parameter_keys(params, 4), 'total_closed', 'net_total']])
+                          self.StrategyClass.get_parameter_keys(params, 3), self.StrategyClass.get_parameter_keys(params, 4), self.StrategyClass.get_parameter_keys(params, 5),
+                          self.StrategyClass.get_parameter_keys(params, 6), 'total_closed', 'net_total']])
 
     def run(self):
         kwargs = self.StrategyClass.get_parameter_list()

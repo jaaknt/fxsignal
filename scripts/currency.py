@@ -15,17 +15,17 @@ symbol_list = ['AUD/CAD','AUD/JPY','AUD/NZD','AUD/USD','CAD/CHF',
                'NZD/CHF','NZD/USD','USD/CAD','USD/CHF','USD/JPY']
 
 def optimizebuy_hma(config, currency):
-    feed = fxsignal.FxcmFeed(currency, datetime(2018, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed = fxsignal.FxcmFeed(currency, datetime(2010, 1, 1), datetime(2019, 8, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
-    runner = fxsignal.OptimizeRunner(feed, data, 'trend_hma','buy')
+    runner = fxsignal.OptimizeRunner(feed, data, 'trend_jackvortex','buy')
     runner.run()
 
 def optimizesell_hma(config, currency):
-    feed = fxsignal.FxcmFeed(currency, datetime(2018, 1, 1), datetime(2019, 5, 1), 'D1', config['fxcm'])
+    feed = fxsignal.FxcmFeed(currency, datetime(2010, 1, 1), datetime(2019, 8, 1), 'D1', config['fxcm'])
     feed.read_csv()
     data = fxsignal.FeedConverter.fxcm2bt(feed.clean())
-    runner = fxsignal.OptimizeRunner(feed, data, 'trend_hma','sell')
+    runner = fxsignal.OptimizeRunner(feed, data, 'trend_jackvortex','sell')
     runner.run()
 
 def run():

@@ -4,6 +4,8 @@ import backtrader.indicators as btind
 
 from .symbol import SymbolParameter
 from .base import BaseStrategy
+#from ..indicators.jack_vortex import JackVortex
+from fxsignal.indicators.jack_vortex import JackVortex
 
 import logging
 
@@ -16,7 +18,6 @@ class BasicStrategy(BaseStrategy):
         verbose=False,
         max_loss_percent = 0.02, # max risk percent from protfolio value per trade
         wma_period=23,
-#        hma_period=17,
         atr_period=5,
         squeeze_period=20,
         stop1_atr_multiplier=0.6,
@@ -34,11 +35,13 @@ class BasicStrategy(BaseStrategy):
 #        self.exit = btind.HMA(self.hlc3, period = self.p.hma_period)
         self.atr = btind.ATR(self.data, period=self.p.atr_period)
 #        self.stddev = btind.StdDev(self.data.close, period=self.p.stddev_period)
-        self.highest = btind.Highest(self.data.high, period=self.p.squeeze_period, plot=False)
-        self.lowest = btind.Lowest(self.data.low, period=self.p.squeeze_period, plot=False)
-        self.sma = btind.MovAv.SMA(self.data.close, period=self.p.squeeze_period, plot=False)
-        self.mean = (self.highest + self.lowest + self.sma) / 3.0
-        self.squeeze = btind.MovAv.SMA((self.data.close - self.mean) / self.data.close, period=self.p.squeeze_period)
+        #self.highest = btind.Highest(self.data.high, period=self.p.squeeze_period, plot=False)
+        #self.lowest = btind.Lowest(self.data.low, period=self.p.squeeze_period, plot=False)
+        #self.sma = btind.MovAv.SMA(self.data.close, period=self.p.squeeze_period, plot=False)
+        #self.mean = (self.highest + self.lowest + self.sma) / 3.0
+        #self.squeeze = btind.MovAv.SMA((self.data.close - self.mean) / self.data.close, period=self.p.squeeze_period, plot=True, subplot=True)
+
+        self.squeeze = JackVortex(squeeze_period=self.p.squeeze_period)
 
 #        self.macd = btind.MACDHisto(self.data.close, period_me1=self.p.macd_fast_period,
 #                                    period_me2=self.p.macd_slow_period, period_signal=self.p.macd_signal_period)
@@ -57,8 +60,9 @@ class BasicStrategy(BaseStrategy):
     @staticmethod
     def get_parameter_list():
         return {"wma_period": [23],
-                #"squeeze_period": [16, 20],
-                "signal_atr_multiplier": [1.3, 5.0],
+                "squeeze_period": [20],
+                "atr_period": [5, 8, 14, 20],
+                "signal_atr_multiplier": [1.3],
                 "stop1_atr_multiplier": [0.6],
                 "target1_atr_multiplier": [1.0, 1.5],
                 "target2_atr_multiplier": [1.0, 1.5]
@@ -69,12 +73,16 @@ class BasicStrategy(BaseStrategy):
         if i == 0:
             return params.wma_period
         elif i == 1:
-            return params.signal_atr_multiplier
+            return params.squeeze_period
         elif i == 2:
-            return params.stop1_atr_multiplier
+            return params.atr_period
         elif i == 3:
-            return params.target1_atr_multiplier
+            return params.signal_atr_multiplier
         elif i == 4:
+            return params.stop1_atr_multiplier
+        elif i == 5:
+            return params.target1_atr_multiplier
+        elif i == 6:
             return params.target2_atr_multiplier
         else:
             return ''
@@ -84,19 +92,19 @@ class BasicStrategy(BaseStrategy):
         if i == 0:
             return 'wma_period'
         elif i == 1:
-            return 'signal_atr_multiplier'
+            return 'squeeze_period'
         elif i == 2:
-            return 'stop1_atr_multiplier'
+            return 'atr_period'
         elif i == 3:
-            return 'target1_atr_multiplier'
+            return 'signal_atr_multiplier'
         elif i == 4:
+            return 'stop1_atr_multiplier'
+        elif i == 5:
+            return 'target1_atr_multiplier'
+        elif i == 6:
             return 'target2_atr_multiplier'
         else:
             return ''
-
-    @staticmethod
-    def get_algorithm_name():
-        return 'trend_hma'
 
     def buy_signal(self):
         if (self.data.close[0] > self.baseline[0]) and (self.data.close[0] < self.baseline[0] + self.atr[0] * self.p.signal_atr_multiplier):

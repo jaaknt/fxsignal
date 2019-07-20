@@ -91,10 +91,6 @@ class BasicStrategy(BaseStrategy):
         else:
             return ''
 
-    @staticmethod
-    def get_algorithm_name():
-        return 'trend_keltner2'
-
     def buy_signal(self):
         if self.stddev * self.p.squeeze_bb_multiplier > self.atr * self.p.squeeze_kc_multiplier:
             if (self.macd_ema[0] > self.macd_ema[-1] and self.macd.histo[0] > self.macd.histo[-1]) and \

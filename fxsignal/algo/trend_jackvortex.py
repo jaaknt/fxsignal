@@ -16,7 +16,7 @@ class BasicStrategy(BaseStrategy):
     params = dict(
         symbol='EUR/USD',
         verbose=False,
-        max_loss_percent = 0.02, # max risk percent from protfolio value per trade
+        max_loss_percent = 0.015, # max risk percent from protfolio value per trade
         wma_period=23,
         atr_period=5,
         squeeze_period=20,
@@ -59,13 +59,13 @@ class BasicStrategy(BaseStrategy):
 
     @staticmethod
     def get_parameter_list():
-        return {"wma_period": [23],
-                "squeeze_period": [20],
-                "atr_period": [5, 8, 14, 20],
-                "signal_atr_multiplier": [1.3],
-                "stop1_atr_multiplier": [0.6],
-                "target1_atr_multiplier": [1.0, 1.5],
-                "target2_atr_multiplier": [1.0, 1.5]
+        return {"wma_period": [23, 30], #23
+                "squeeze_period": [15, 20], #20
+                "atr_period": [5, 14], #14
+                "signal_atr_multiplier": [1.3, 1.8, 2.5], # 1.8
+                "stop1_atr_multiplier": [0.6], # 0.6
+                "target1_atr_multiplier": [1.0, 1.5], # 1.5
+                "target2_atr_multiplier": [1.0, 1.5] # 1.0
                 }
 
     @staticmethod

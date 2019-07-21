@@ -89,8 +89,9 @@ class AlgoRunner(BaseRunner):
 
 
 class OptimizeRunner(BaseRunner):
-    def __init__(self, feed, data, algo, strategy, cash=100000.0, leverage=30, output_dir='./output/', plot=False, verbose=False):
+    def __init__(self, feed, data, algo, strategy, cash=100000.0, leverage=30, output_dir='./output/', plot=False, verbose=False, file_id=''):
         super().__init__(feed, data, algo, strategy, cash=cash, leverage=leverage, output_dir=output_dir, plot=plot, verbose=verbose)
+        self.flie_id = file_id
 
     def statistics(self, strats):
         stat = []
@@ -119,7 +120,7 @@ class OptimizeRunner(BaseRunner):
                                    'total_closed', 'net_total',
                                    'won_total', 'won_net', 'won_max', 'won_avg',
                                    'lost_total', 'lost_net', 'lost_max', 'lost_avg'])
-        df.to_csv('{}{}_{}{}.csv'.format(self.output_dir, self.get_strategy_class_name(), self.strategy, self.feed.symbol.replace('/','')), sep=';')
+        df.to_csv('{}{}_{}{}{}.csv'.format(self.output_dir, self.get_strategy_class_name(), self.strategy, self.feed.symbol.replace('/',''), self.flie_id), sep=';')
         log.info(df.sort_values(['net_total'], ascending=False).head(5)[
                          ['strategy', 'symbol', self.StrategyClass.get_parameter_keys(params, 0), self.StrategyClass.get_parameter_keys(params, 1), self.StrategyClass.get_parameter_keys(params, 2),
                           self.StrategyClass.get_parameter_keys(params, 3), self.StrategyClass.get_parameter_keys(params, 4), self.StrategyClass.get_parameter_keys(params, 5),

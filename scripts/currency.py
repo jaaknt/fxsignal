@@ -9,8 +9,8 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.FileHandler("./logs/currency.log"), logging.StreamHandler()])
 log = logging.getLogger(__name__)
 
-symbol_list = ['AUD/CAD','AUD/JPY','AUD/NZD','AUD/USD',#'CAD/CHF',
-               'CAD/JPY','EUR/CHF','EUR/JPY','EUR/NZD','EUR/USD',
+symbol_list = ['AUD/CAD','AUD/JPY','AUD/NZD','AUD/USD',#'CAD/CHF','CAD/JPY',
+               'EUR/CHF','EUR/JPY','EUR/NZD','EUR/USD',
                'GBP/AUD','GBP/CHF','GBP/JPY','GBP/NZD','GBP/USD',
                'NZD/CHF','NZD/USD','USD/CAD','USD/CHF','USD/JPY']
 

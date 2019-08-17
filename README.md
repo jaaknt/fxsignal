@@ -15,3 +15,5 @@ Local build
 > python setup.py install
 Testing
 > python scripts/algo.py
+Collect forex data to ./data directory using fxcmpy API
+> python .\scripts\collect.py

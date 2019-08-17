@@ -71,7 +71,8 @@ class FxcmFeed(Feed):
     def clean(self):
         self.history = pd.DataFrame()
         self.history = self.history.append(self.data, ignore_index = True)
-        self.history.drop(self.history[self.history.tickqty < 2000].index, inplace=True)
+        if self.period == 'D1':
+            self.history.drop(self.history[self.history.tickqty < 2000].index, inplace=True)
         #print(self.history.info())
         #print(self.history.head(5))
         return self.history

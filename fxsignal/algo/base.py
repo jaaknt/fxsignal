@@ -41,9 +41,9 @@ class BaseStrategy(bt.Strategy):
             '{} | Order ref: {} | Type {} | Status {} | Price {:.5f}'.format(self.data.datetime.datetime(0), order.ref,
                                                                              order.ordtypename(), order.getstatusname(), price))
         if order.status == order.Margin:
-            log.info('{} | MARGIN CALL Order ref: {} | Type {} | Status {} | Price {:.5f}'.format(
+            log.info('{} | MARGIN CALL Order ref: {} | Type {} | Status {} | Price {:.5f} | Size {:.0f} | Cash {:.2f} | Leverage {:.0f}'.format(
                 self.data.datetime.datetime(0), order.ref, order.ordtypename(),
-                order.getstatusname(), price))
+                order.getstatusname(), price, self.size, self.broker.get_cash(), self.broker.getcommissioninfo(self.data).get_leverage()))
 
         old_stage = self.stage
         if order.status == order.Completed:

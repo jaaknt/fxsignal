@@ -39,6 +39,7 @@ class BaseRunner():
     def set_start_position(self, cash, leverage):
         self.cerebro.broker.setcash(cash)
         self.cerebro.broker.setcommission(leverage=leverage)
+        log.info("cash: {} leverage: {}".format(self.cerebro.broker.get_cash(), self.cerebro.broker.getcommissioninfo(self.data).get_leverage()))
 
     def add_analyzer(self, analyzer=bt.analyzers.TradeAnalyzer):
         self.cerebro.addanalyzer(analyzer)

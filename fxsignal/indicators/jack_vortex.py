@@ -3,7 +3,7 @@ import backtrader.indicators as btind
 
 class JackVortex(bt.Indicator):
     '''
-    My deveped indicator that is similar to VORTEX indicator
+    My developed indicator that is similar to VORTEX indicator
 
     '''
     lines = ('jack_vortex',)

@@ -44,8 +44,8 @@ def collect(config):
 
 def collect_chunk(config):
     ''' Collects data by months (there is 10000 records limitation in fxcmpy API) '''
-    start_date = datetime(2010, 1, 1)
-    end_date = datetime(2019, 9, 1)
+    start_date = datetime(2018, 1, 1)
+    end_date = datetime(2019, 12, 31)
     for symbol in symbol_list:
         chunk_start_date = start_date
         chunk_end_date = start_date + relativedelta(months=+1)
@@ -57,7 +57,7 @@ def collect_chunk(config):
             feed.close()
             data = feed.clean()
             history = history.append(data, ignore_index = True)
-            chunk_start_date = chunk_end_date+relativedelta(seconds=+1) 
+            chunk_start_date = chunk_end_date+relativedelta(seconds=+1)
             chunk_end_date   = chunk_end_date+relativedelta(months=+1)
 
         feed.save_csv(history)

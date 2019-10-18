@@ -23,7 +23,9 @@ class BasicStrategy(BaseStrategy):
     )
 
     def __init__(self):
-        super().__init__()
+        super().__init__(verbose=self.p.verbose)
+        if self.p.verbose:
+            log.setLevel(logging.DEBUG)
         # indicators
         self.atr = btind.ATR(self.data, period=self.p.atr_period)
         self.hlc3 = (self.data.high + self.data.low + self.data.close)/3
@@ -99,7 +101,7 @@ class BasicStrategy(BaseStrategy):
             return ''
 
     def buy_signal(self):
-        if (self.data.close[0] > self.baseline[0]) and (self.data.close[0] > self.highest_close[-1]):
+        if (self.data.close[0] > self.baseline[0]) and (self.data.close[0] > self.highest_close[-1]) and (self.atr[0] > 10 * self.symbol_parameter.get_pip_size()):
             if (self.data.high[0] - self.data.low[0] > self.atr[0] * self.p.volatility_atr_multiplier) and (self.data.datetime.datetime(0).strftime('%H:%M') in ['06:30','07:00','07:30','08:00','08:30']) and (self.data.high[0] - self.data.low[0] > 0.0010):
                 log.debug('{} | Time {} | High - Low{:.5f} | ATR {:.5f}'.format(
                     self.data.datetime.datetime(0), self.data.datetime.datetime(0).strftime('%H:%M'), self.data.high[0] - self.data.low[0], self.atr[0]))
@@ -107,7 +109,7 @@ class BasicStrategy(BaseStrategy):
         return False
 
     def sell_signal(self):
-        if (self.data.close[0] < self.baseline[0]) and (self.data.close[0] < self.lowest_close[-1]):
+        if (self.data.close[0] < self.baseline[0]) and (self.data.close[0] < self.lowest_close[-1]) and (self.atr[0] > 10 * self.symbol_parameter.get_pip_size()):
             if (self.data.high[0] - self.data.low[0] > self.atr[0] * self.p.volatility_atr_multiplier) and (self.data.datetime.datetime(0).strftime('%H:%M') in ['06:30','07:00','07:30','08:00','08:30']) and (self.data.high[0] - self.data.low[0] > 0.0010):
                 return True
         return False
@@ -119,10 +121,10 @@ class BasicStrategy(BaseStrategy):
         return False
 
     def get_stop1_price(self):
-        return self.p.stop1_atr_multiplier * self.atr
+        return max(self.p.stop1_atr_multiplier * self.atr[0], 10 * self.symbol_parameter.get_pip_size())
 
     def get_target1_price(self):
-        return self.p.target1_atr_multiplier * self.atr
+        return self.p.target1_atr_multiplier * self.atr[0]
 
     def get_stop2_price(self):
         return 3 * self.symbol_parameter.get_pip_size()

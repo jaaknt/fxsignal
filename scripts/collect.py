@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO,
 #               'GBP/CHF', 'NZD/CHF', 'USD/JPY']
 
 # 'AUD/CHF','CHF/JPY','EUR/AUD','EUR/CAD','EUR/GBP','GBP/CAD','NZD/JPY',
-symbol_list = ['GBP/USD']
+symbol_list = ['AUD/USD', 'USD/CAD', 'NZD/USD', 'USD/CHF','USD/JPY']
 
 #symbol_list = ['AUD/CAD','AUD/JPY','AUD/NZD','AUD/USD','CAD/CHF',
 #               'CAD/JPY','EUR/CHF','EUR/JPY','EUR/NZD','EUR/USD',
@@ -44,11 +44,11 @@ def collect(config):
 
 def collect_chunk(config):
     ''' Collects data by months (there is 10000 records limitation in fxcmpy API) '''
-    start_date = datetime(2018, 1, 1)
+    start_date = datetime(2010, 1, 1)
     end_date = datetime(2019, 12, 31)
     for symbol in symbol_list:
         chunk_start_date = start_date
-        chunk_end_date = start_date + relativedelta(months=+1)
+        chunk_end_date = start_date + relativedelta(months=+6)
         history = pd.DataFrame()
 
         while (chunk_start_date < end_date):
@@ -58,7 +58,7 @@ def collect_chunk(config):
             data = feed.clean()
             history = history.append(data, ignore_index = True)
             chunk_start_date = chunk_end_date+relativedelta(seconds=+1)
-            chunk_end_date   = chunk_end_date+relativedelta(months=+1)
+            chunk_end_date   = chunk_end_date+relativedelta(months=+6)
 
         feed.save_csv(history)
         logging.info("{} count: {}".format(symbol, len(history.index)))

@@ -132,8 +132,8 @@ class BaseStrategy(bt.Strategy):
                 self.target1_price = self.data.close + self.get_target1_price()
 
                 self.size = self.symbol_parameter.get_size(self.get_stop1_price())
-                #log.debug('{} size: {:.0f} atr: {:.5f} multiplier: {:.2f}'.format(
-                #    self.data.datetime.datetime(0), self.size, self.atr[0], self.p.stop1_atr_multiplier))
+                log.debug('{} size: {:.0f} atr: {:.5f} multiplier: {:.2f}, stop1: {:.5f}'.format(
+                    self.data.datetime.datetime(0), self.size, self.atr[0], self.p.stop1_atr_multiplier, self.get_stop1_price()))
 
                 self.main_order = self.buy(exectype=bt.Order.Market, price=None, size=self.size, transmit=True)
                 self.stop_order = self.sell(exectype=bt.Order.Stop,
@@ -184,8 +184,8 @@ class BaseStrategy(bt.Strategy):
                 self.target1_price = self.data.close - self.get_target1_price()
 
                 self.size = self.symbol_parameter.get_size(self.get_stop1_price())
-                # log.debug('{} size: {:.0f} atr: {:.5f} multiplier: {:.2f}'.format(
-                #    self.data.datetime.datetime(0), self.size, self.atr[0], self.p.stop1_atr_multiplier))
+                log.debug('{} size: {:.0f} atr: {:.5f} multiplier: {:.2f}, stop1: {:.5f}'.format(
+                    self.data.datetime.datetime(0), self.size, self.atr[0], self.p.stop1_atr_multiplier, self.get_stop1_price()))
 
                 self.main_order = self.sell(exectype=bt.Order.Market, price=None, size=self.size, transmit=True)
                 self.stop_order = self.buy(exectype=bt.Order.Stop,

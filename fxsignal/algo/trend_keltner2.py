@@ -28,7 +28,7 @@ class BasicStrategy(BaseStrategy):
     )
 
     def __init__(self):
-        super().__init__()
+        super().__init__(verbose=self.p.verbose)
         # self.ema_short = btind.MovAv.EMA(self.data.close, period=self.p.ema_short_period)
         self.atr = btind.ATR(self.data, period=self.p.atr_period)
         self.stddev = btind.StdDev(self.data.close, period=self.p.stddev_period)

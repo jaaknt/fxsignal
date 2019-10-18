@@ -52,8 +52,9 @@ class SymbolParameter(object):
 
     def get_size(self, forex_amount):
         """ Calculate trade size by stoploss pips and max loss percent from trade account balance"""
-        pips = round(forex_amount / symbol_setup[self.symbol]['pip'],5)
-        return max(round((self.cash * self.max_loss_percent) / (pips * symbol_setup[self.symbol]['pip_value']), 2), 1.0) * 1000
+        pips = round(forex_amount / symbol_setup[self.symbol]['pip'],0)
+        # log.info('pips: {:.5f} | max loss: {:.5f} | pip value: {:.5f}'.format(pips, self.cash * self.max_loss_percent, pips * symbol_setup[self.symbol]['pip_value']))
+        return round((self.cash * self.max_loss_percent) / (pips * symbol_setup[self.symbol]['pip_value']), 2) * 1000
 
     def get_pip_size(self):
         return symbol_setup[self.symbol]['pip']
